@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Article</title>
-
+  
   <!-- Favicon -->
   <link rel="icon" href="https://lh3.googleusercontent.com/d/1GFKnYSgrZVqhVp8ZMqyG5II0nLk_HIPM" type="image/png">
 
@@ -13,17 +13,16 @@
       margin: 0;
       padding: 0;
       height: 100%;
-      overflow: hidden; /* Disable scrolling on the main page */
       background: #f3f4f6;
       font-family: Arial, sans-serif;
     }
 
-    /* Fullscreen container */
+    /* Fullscreen container for continuous scrolling */
     #frame {
       width: 100%;
       height: 100vh;
       border: none;
-      overflow-y: scroll; /* Allow scrolling on iframe */
+      overflow-y: scroll;
     }
 
     /* News Button */
@@ -67,7 +66,7 @@
   <!-- News Button -->
   <a id="news-button" href="https://sites.google.com/view/f9-racing-official-website/news" target="_blank">News</a>
 
-  <!-- Iframe for Google Docs -->
+  <!-- Embed the Google Docs in continuous scroll -->
   <iframe id="frame"></iframe>
   <div id="error">No article found.</div>
 
@@ -82,11 +81,9 @@
       frame.style.display = "none";
       error.style.display = "block";
     } else {
-      // Convert Google Docs link to embed format for continuous scrolling
-      let cleanUrl = docUrl.replace("/edit", "/preview"); // Remove '/edit' for embedding
-      
-      // Embed the document with a scrollable iframe without page breaks
-      frame.src = `https://docs.google.com/document/d/${docUrl.split('/')[5]}/preview`;
+      // Convert Google Docs link to continuous scroll view (no page breaks)
+      const cleanUrl = docUrl.replace("/edit", "/export?format=pdf"); // Use export link for better viewing
+      frame.src = `https://docs.google.com/viewer?url=${encodeURIComponent(cleanUrl)}&embedded=true`;
     }
   </script>
 
