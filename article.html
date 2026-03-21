@@ -74,8 +74,8 @@
       frame.style.display = "none";
       error.style.display = "block";
     } else {
-      // Use the Pageless Google Doc URL directly
-      let cleanUrl = docUrl.replace("/edit", "/pub");  // Using published URL for continuous scrolling
+      // Use the Pageless Google Doc embed link
+      let cleanUrl = docUrl.replace("/edit", "/preview");  // Use preview for a clean embed without the UI
 
       frame.src = cleanUrl;
     }
