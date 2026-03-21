@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Article</title>
-  
+
   <!-- Favicon -->
   <link rel="icon" href="https://lh3.googleusercontent.com/d/1GFKnYSgrZVqhVp8ZMqyG5II0nLk_HIPM" type="image/png">
 
@@ -17,7 +17,7 @@
       font-family: Arial, sans-serif;
     }
 
-    /* Fullscreen container for Google Docs */
+    /* Fullscreen container */
     #frame {
       width: 100%;
       height: 100vh;
@@ -74,8 +74,9 @@
       frame.style.display = "none";
       error.style.display = "block";
     } else {
-      // Use the Pageless Google Doc embed link
-      let cleanUrl = docUrl.replace("/edit", "/preview");  // Use preview for a clean embed without the UI
+      // Add the embedded URL with no UI
+      let cleanUrl = docUrl
+        .replace("/edit", "/pub?embedded=true");  // The published and embedded URL
 
       frame.src = cleanUrl;
     }
