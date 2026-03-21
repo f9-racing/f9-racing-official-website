@@ -1,34 +1,47 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
   <meta charset="UTF-8">
-  <title>News Article</title>
+  <title>Article</title>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
 
 <body class="bg-gray-100 p-4">
 
-  <div class="max-w-4xl mx-auto bg-white rounded-lg shadow p-4">
-    <iframe id="docFrame" class="w-full h-[80vh] rounded"></iframe>
+  <div id="content" class="max-w-3xl mx-auto bg-white p-6 rounded shadow">
+    Loading article...
   </div>
 
-<script>
-  const params = new URLSearchParams(window.location.search);
-  const docUrl = params.get("doc");
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const docUrl = params.get("doc");
 
-  if (docUrl) {
-    // Convert Google Docs link to clean preview mode
-    let cleanUrl = docUrl
-      .replace("/edit", "/preview")
-      .replace("/view", "/preview");
+    async function loadDoc() {
+      if (!docUrl) {
+        document.getElementById("content").innerHTML = "No article found.";
+        return;
+      }
 
-    // FULL PAGE redirect (no iframe)
-    window.location.href = cleanUrl;
+      const exportUrl = docUrl.replace("/edit", "/export?format=html");
 
-  } else {
-    document.body.innerHTML = "<p style='text-align:center;color:red;'>No article found.</p>";
-  }
-</script>
+      try {
+        const res = await fetch(exportUrl);
+        const html = await res.text();
+
+        // Extract body content only
+        const bodyContent = html.match(/<body[^>]*>([\s\S]*?)<\/body>/i);
+
+        document.getElementById("content").innerHTML =
+          bodyContent ? bodyContent[1] : html;
+
+      } catch (err) {
+        document.getElementById("content").innerHTML =
+          "Failed to load article.";
+      }
+    }
+
+    loadDoc();
+  </script>
 
 </body>
 </html>
