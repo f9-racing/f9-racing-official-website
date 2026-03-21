@@ -74,9 +74,10 @@
       frame.style.display = "none";
       error.style.display = "block";
     } else {
-      // Add the embedded URL with no UI
+      // Convert Google Docs link to preview mode
       let cleanUrl = docUrl
-        .replace("/edit", "/pub?embedded=true");  // The published and embedded URL
+        .replace("/edit", "/preview")  // Ensure it's in preview mode
+        .replace("/view", "/preview"); // If it's view mode, convert to preview mode
 
       frame.src = cleanUrl;
     }
