@@ -1,46 +1,59 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Article</title>
-  <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      background: #f3f4f6;
+    }
+
+    /* Fullscreen container */
+    #frame {
+      width: 100%;
+      height: 100vh;
+      border: none;
+    }
+
+    /* Fallback message */
+    #error {
+      display: none;
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding: 40px;
+      color: red;
+    }
+  </style>
 </head>
 
-<body class="bg-gray-100 p-4">
+<body>
 
-  <div id="content" class="max-w-3xl mx-auto bg-white p-6 rounded shadow">
-    Loading article...
-  </div>
+  <iframe id="frame"></iframe>
+  <div id="error">No article found.</div>
 
   <script>
     const params = new URLSearchParams(window.location.search);
     const docUrl = params.get("doc");
 
-    async function loadDoc() {
-      if (!docUrl) {
-        document.getElementById("content").innerHTML = "No article found.";
-        return;
-      }
+    const frame = document.getElementById("frame");
+    const error = document.getElementById("error");
 
-      const exportUrl = docUrl.replace("/edit", "/export?format=html");
+    if (!docUrl) {
+      frame.style.display = "none";
+      error.style.display = "block";
+    } else {
+      // Convert Google Docs link to FULL-FORMAT preview mode
+      let cleanUrl = docUrl
+        .replace("/edit", "/preview")
+        .replace("/view", "/preview");
 
-      try {
-        const res = await fetch(exportUrl);
-        const html = await res.text();
-
-        // Extract body content only
-        const bodyContent = html.match(/<body[^>]*>([\s\S]*?)<\/body>/i);
-
-        document.getElementById("content").innerHTML =
-          bodyContent ? bodyContent[1] : html;
-
-      } catch (err) {
-        document.getElementById("content").innerHTML =
-          "Failed to load article.";
-      }
+      frame.src = cleanUrl;
     }
-
-    loadDoc();
   </script>
 
 </body>
