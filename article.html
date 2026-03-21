@@ -4,6 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Article</title>
+  
+  <!-- Favicon -->
+  <link rel="icon" href="https://lh3.googleusercontent.com/d/1GFKnYSgrZVqhVp8ZMqyG5II0nLk_HIPM" type="image/png">
 
   <style>
     html, body {
@@ -11,6 +14,7 @@
       padding: 0;
       height: 100%;
       background: #f3f4f6;
+      font-family: Arial, sans-serif;
     }
 
     /* Fullscreen container */
@@ -23,15 +27,38 @@
     /* Fallback message */
     #error {
       display: none;
-      font-family: Arial, sans-serif;
       text-align: center;
       padding: 40px;
       color: red;
+    }
+
+    /* News Button */
+    #news-button {
+      display: block;
+      width: 200px;
+      padding: 12px;
+      margin: 20px auto;
+      background-color: #1abc9c; /* Turquoise color */
+      color: white;
+      font-size: 16px;
+      text-align: center;
+      text-decoration: none;
+      border-radius: 5px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    #news-button:hover {
+      background-color: #16a085; /* Darker turquoise on hover */
     }
   </style>
 </head>
 
 <body>
+
+  <!-- News Button -->
+  <a id="news-button" href="https://sites.google.com/view/f9-racing-official-website/news" target="_blank">News</a>
 
   <iframe id="frame"></iframe>
   <div id="error">No article found.</div>
