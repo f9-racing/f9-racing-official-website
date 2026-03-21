@@ -17,11 +17,19 @@
       font-family: Arial, sans-serif;
     }
 
-    /* Fullscreen container for the Google Docs embedded content */
+    /* Fullscreen container for Google Docs */
     #frame {
       width: 100%;
       height: 100vh;
       border: none;
+    }
+
+    /* Fallback message */
+    #error {
+      display: none;
+      text-align: center;
+      padding: 40px;
+      color: red;
     }
 
     /* News Button */
@@ -39,23 +47,10 @@
       box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
       cursor: pointer;
       transition: background-color 0.3s ease;
-      position: fixed; /* Fixed position at the top */
-      top: 20px; /* Slight margin from the top */
-      left: 50%; /* Center horizontally */
-      transform: translateX(-50%); /* Adjust to center */
-      z-index: 1000; /* Ensure it's above the iframe */
     }
 
     #news-button:hover {
       background-color: #16a085; /* Darker turquoise on hover */
-    }
-
-    /* Fallback message for missing article */
-    #error {
-      display: none;
-      text-align: center;
-      padding: 40px;
-      color: red;
     }
   </style>
 </head>
@@ -65,9 +60,7 @@
   <!-- News Button -->
   <a id="news-button" href="https://sites.google.com/view/f9-racing-official-website/news" target="_blank">News</a>
 
-  <!-- Embed the Google Docs in continuous scroll (HTML version) -->
   <iframe id="frame"></iframe>
-  
   <div id="error">No article found.</div>
 
   <script>
@@ -81,9 +74,10 @@
       frame.style.display = "none";
       error.style.display = "block";
     } else {
-      // Convert Google Docs link to the embed version for continuous scroll
-      let cleanUrl = docUrl.replace("/edit", "/pub");
-      frame.src = cleanUrl + "?embedded=true";
+      // Use the Pageless Google Doc URL directly
+      let cleanUrl = docUrl.replace("/edit", "/pub");  // Using published URL for continuous scrolling
+
+      frame.src = cleanUrl;
     }
   </script>
 
