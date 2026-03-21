@@ -17,12 +17,11 @@
       font-family: Arial, sans-serif;
     }
 
-    /* Fullscreen container for continuous scrolling */
+    /* Fullscreen container for the Google Docs embedded content */
     #frame {
       width: 100%;
       height: 100vh;
       border: none;
-      overflow-y: scroll;
     }
 
     /* News Button */
@@ -66,8 +65,9 @@
   <!-- News Button -->
   <a id="news-button" href="https://sites.google.com/view/f9-racing-official-website/news" target="_blank">News</a>
 
-  <!-- Embed the Google Docs in continuous scroll -->
+  <!-- Embed the Google Docs in continuous scroll (HTML version) -->
   <iframe id="frame"></iframe>
+  
   <div id="error">No article found.</div>
 
   <script>
@@ -81,9 +81,9 @@
       frame.style.display = "none";
       error.style.display = "block";
     } else {
-      // Convert Google Docs link to continuous scroll view (no page breaks)
-      const cleanUrl = docUrl.replace("/edit", "/export?format=pdf"); // Use export link for better viewing
-      frame.src = `https://docs.google.com/viewer?url=${encodeURIComponent(cleanUrl)}&embedded=true`;
+      // Convert Google Docs link to the embed version for continuous scroll
+      let cleanUrl = docUrl.replace("/edit", "/pub");
+      frame.src = cleanUrl + "?embedded=true";
     }
   </script>
 
