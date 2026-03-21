@@ -82,12 +82,11 @@
       frame.style.display = "none";
       error.style.display = "block";
     } else {
-      // Convert Google Docs link to FULL-FORMAT preview mode
-      let cleanUrl = docUrl
-        .replace("/edit", "/preview")
-        .replace("/view", "/preview");
-
-      frame.src = cleanUrl;
+      // Convert Google Docs link to embed format for continuous scrolling
+      let cleanUrl = docUrl.replace("/edit", "/preview"); // Remove '/edit' for embedding
+      
+      // Embed the document with a scrollable iframe without page breaks
+      frame.src = `https://docs.google.com/document/d/${docUrl.split('/')[5]}/preview`;
     }
   </script>
 
