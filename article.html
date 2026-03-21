@@ -12,19 +12,23 @@
     <iframe id="docFrame" class="w-full h-[80vh] rounded"></iframe>
   </div>
 
-  <script>
-    const params = new URLSearchParams(window.location.search);
-    const docUrl = params.get("doc");
+<script>
+  const params = new URLSearchParams(window.location.search);
+  const docUrl = params.get("doc");
 
-    if (docUrl) {
-      // Convert to EMBED view
-      let embedUrl = docUrl.replace("/edit", "/preview");
+  if (docUrl) {
+    // Convert Google Docs link to clean preview mode
+    let cleanUrl = docUrl
+      .replace("/edit", "/preview")
+      .replace("/view", "/preview");
 
-      document.getElementById("docFrame").src = embedUrl;
-    } else {
-      document.body.innerHTML = "<p class='text-center text-red-500'>No article found.</p>";
-    }
-  </script>
+    // FULL PAGE redirect (no iframe)
+    window.location.href = cleanUrl;
+
+  } else {
+    document.body.innerHTML = "<p style='text-align:center;color:red;'>No article found.</p>";
+  }
+</script>
 
 </body>
 </html>
