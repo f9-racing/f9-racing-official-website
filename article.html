@@ -1,106 +1,144 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Article</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
-  <style>
-    body {
-      margin: 0;
-      padding: 0;
-      font-family: 'Inter', sans-serif;
-      background-color: #f3f4f6;
-      color: #333;
-      display: flex;
-      flex-direction: column;
-      min-height: 100vh;
-    }
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Article</title>
 
-    #header {
-      text-align: center;
-      padding: 20px;
-      background-color: #1abc9c;
-      color: white;
-    }
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Inter&display=swap" rel="stylesheet" />
 
-    #frame {
-      flex: 1;
-      width: 100%;
-      border: none;
-      min-height: 400px;
-    }
+<style>
+  body {
+    margin: 0;
+    font-family: 'Inter', sans-serif;
+    background: #f9fafb;
+    color: #222;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+  }
 
-    #error {
-      display: none;
-      text-align: center;
-      padding: 40px;
-      color: red;
-      font-size: 18px;
-    }
+  main {
+    flex-grow: 1;
+    max-width: 800px;
+    margin: 1rem auto;
+    padding: 0 1rem;
+  }
 
-    #news-button {
-      display: block;
-      width: 200px;
-      padding: 12px;
-      margin: 20px auto;
-      background-color: #16a085;
-      color: white;
-      font-size: 16px;
-      text-align: center;
-      text-decoration: none;
-      border-radius: 5px;
-      transition: background-color 0.3s ease;
-    }
+  #back-to-news {
+    display: block;
+    max-width: 200px;
+    margin: 1.5rem auto;
+    padding: 0.75rem 1.5rem;
+    background-color: #16a085;
+    color: white;
+    text-align: center;
+    font-weight: 600;
+    border-radius: 6px;
+    text-decoration: none;
+    box-shadow: 0 4px 6px rgb(0 0 0 / 0.1);
+    transition: background-color 0.3s ease;
+  }
 
-    #news-button:hover {
-      background-color: #13856b;
-    }
+  #back-to-news:hover {
+    background-color: #13876f;
+  }
 
-    /* Responsive iframe content */
-    iframe {
-      height: 100%;
-    }
-  </style>
+  #doc-container {
+    background: white;
+    box-shadow: 0 2px 8px rgb(0 0 0 / 0.1);
+    padding: 1.5rem;
+    border-radius: 8px;
+    overflow-x: auto;
+  }
+
+  /* Hide Google Docs banner and unwanted headings */
+  div[role="banner"],
+  h1, h2, h3, h4, h5, h6,
+  /* Also hide the footer texts from Google Docs publish */
+  p, span {
+    display: none !important;
+  }
+  
+  /* But we want to keep Back to News and main container visible */
+  #back-to-news,
+  #doc-container {
+    display: block !important;
+  }
+
+  /* Ensure images inside doc scale properly */
+  #doc-container img {
+    max-width: 100%;
+    height: auto;
+  }
+</style>
 </head>
 <body>
-  <header id="header">
-    <h1>Article</h1>
-  </header>
 
-  <a id="news-button" href="https://sites.google.com/view/f9-racing-official-website/news" target="_blank">Back to News</a>
+<a id="back-to-news" href="https://sites.google.com/view/f9-racing-official-website/news" rel="noopener noreferrer">Back to News</a>
 
-  <iframe id="frame"></iframe>
-  <div id="error">No article found or the document is not published.</div>
+<main>
+  <div id="doc-container"></div>
+</main>
 
-  <script>
-    // Get the doc URL from the query parameter
-    const params = new URLSearchParams(window.location.search);
-    let docUrl = params.get("doc");
+<script>
+  const params = new URLSearchParams(window.location.search);
+  let docUrl = params.get("doc");
 
-    const frame = document.getElementById("frame");
-    const error = document.getElementById("error");
+  const container = document.getElementById("doc-container");
 
-    // Helper: validate if the URL is a proper Google Docs published link
-    function isPublishedDoc(url) {
-      return url && url.includes("/pub");
-    }
+  if (!docUrl) {
+    container.innerHTML = "<p style='color: red; text-align:center;'>No article found.</p>";
+  } else {
+    // Use the published Google Docs URL as is, no /pub?embedded=false because that adds banner
+    // We'll fetch the published HTML and inject only the content inside the body, excluding banners
 
-    if (!docUrl || !isPublishedDoc(docUrl)) {
-      frame.style.display = "none";
-      error.style.display = "block";
-    } else {
-      // Set iframe src
-      frame.src = docUrl;
+    fetch(docUrl)
+      .then(response => {
+        if (!response.ok) throw new Error("Failed to load document.");
+        return response.text();
+      })
+      .then(htmlText => {
+        // Parse the fetched HTML
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(htmlText, "text/html");
 
-      // Make sure iframe fills viewport on mobile
-      frame.style.height = window.innerHeight - frame.getBoundingClientRect().top + "px";
+        // Remove Google Docs banner by role="banner"
+        const banner = doc.querySelector('div[role="banner"]');
+        if (banner) banner.remove();
 
-      // Optional: adjust on resize
-      window.addEventListener("resize", () => {
-        frame.style.height = window.innerHeight - frame.getBoundingClientRect().top + "px";
+        // Remove unwanted headings (h1-h6)
+        doc.querySelectorAll("h1, h2, h3, h4, h5, h6").forEach(el => el.remove());
+
+        // Remove footer update text by checking for known text pattern
+        doc.querySelectorAll("p, span").forEach(el => {
+          if (/updated automatically/i.test(el.textContent) || /published using google docs/i.test(el.textContent)) {
+            el.remove();
+          }
+        });
+
+        // Grab the main content container - usually inside <body>
+        // Some published docs wrap content in <div id="contents"> or <body> directly
+        // Let's take all body children except scripts and styles
+        const bodyChildren = Array.from(doc.body.children).filter(
+          el => el.tagName.toLowerCase() !== "script" && el.tagName.toLowerCase() !== "style"
+        );
+
+        // Clear our container first
+        container.innerHTML = "";
+
+        // Append those elements to our container
+        bodyChildren.forEach(el => {
+          container.appendChild(el.cloneNode(true));
+        });
+
+      })
+      .catch(err => {
+        container.innerHTML = `<p style="color: red; text-align:center;">${err.message}</p>`;
       });
-    }
-  </script>
+  }
+</script>
+
 </body>
 </html>
