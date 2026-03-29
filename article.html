@@ -4,14 +4,39 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Article</title>
-
-  <link rel="icon" href="https://lh3.googleusercontent.com/d/1GFKnYSgrZVqhVp8ZMqyG5II0nLk_HIPM">
-
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
   <style>
     body {
       margin: 0;
-      font-family: Arial, sans-serif;
-      background: #f3f4f6;
+      padding: 0;
+      font-family: 'Inter', sans-serif;
+      background-color: #f3f4f6;
+      color: #333;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    #header {
+      text-align: center;
+      padding: 20px;
+      background-color: #1abc9c;
+      color: white;
+    }
+
+    #frame {
+      flex: 1;
+      width: 100%;
+      border: none;
+      min-height: 400px;
+    }
+
+    #error {
+      display: none;
+      text-align: center;
+      padding: 40px;
+      color: red;
+      font-size: 18px;
     }
 
     #news-button {
@@ -19,78 +44,63 @@
       width: 200px;
       padding: 12px;
       margin: 20px auto;
-      background-color: #1abc9c;
+      background-color: #16a085;
       color: white;
+      font-size: 16px;
       text-align: center;
-      border-radius: 5px;
       text-decoration: none;
+      border-radius: 5px;
+      transition: background-color 0.3s ease;
     }
 
-    #content {
-      max-width: 800px;
-      margin: 20px auto;
-      background: white;
-      padding: 20px;
-      border-radius: 8px;
+    #news-button:hover {
+      background-color: #13856b;
     }
 
-    /* 🔥 THIS fixes your issue */
-    #content img {
-      max-width: 100%;
-      height: auto;
-      display: block;
-      margin: 10px auto;
-    }
-
-    #error {
-      display: none;
-      text-align: center;
-      color: red;
-      margin-top: 40px;
+    /* Responsive iframe content */
+    iframe {
+      height: 100%;
     }
   </style>
 </head>
-
 <body>
+  <header id="header">
+    <h1>Article</h1>
+  </header>
 
-<a id="news-button"
-   href="https://sites.google.com/view/f9-racing-official-website/news"
-   target="_blank">
-   News
-</a>
+  <a id="news-button" href="https://sites.google.com/view/f9-racing-official-website/news" target="_blank">Back to News</a>
 
-<div id="content">Loading article...</div>
-<div id="error">No article found.</div>
+  <iframe id="frame"></iframe>
+  <div id="error">No article found or the document is not published.</div>
 
-<script>
-  const params = new URLSearchParams(window.location.search);
-  const docUrl = params.get("doc");
+  <script>
+    // Get the doc URL from the query parameter
+    const params = new URLSearchParams(window.location.search);
+    let docUrl = params.get("doc");
 
-  const contentDiv = document.getElementById("content");
-  const errorDiv = document.getElementById("error");
+    const frame = document.getElementById("frame");
+    const error = document.getElementById("error");
 
-  if (!docUrl) {
-    contentDiv.style.display = "none";
-    errorDiv.style.display = "block";
-  } else {
-    // Fetch the published Google Doc HTML
-    fetch(docUrl)
-      .then(res => res.text())
-      .then(html => {
-        // Extract body content
-        const parser = new DOMParser();
-        const doc = parser.parseFromString(html, "text/html");
+    // Helper: validate if the URL is a proper Google Docs published link
+    function isPublishedDoc(url) {
+      return url && url.includes("/pub");
+    }
 
-        const article = doc.querySelector("body");
+    if (!docUrl || !isPublishedDoc(docUrl)) {
+      frame.style.display = "none";
+      error.style.display = "block";
+    } else {
+      // Set iframe src
+      frame.src = docUrl;
 
-        contentDiv.innerHTML = article.innerHTML;
-      })
-      .catch(() => {
-        contentDiv.style.display = "none";
-        errorDiv.style.display = "block";
+      // Make sure iframe fills viewport on mobile
+      frame.style.height = window.innerHeight - frame.getBoundingClientRect().top + "px";
+
+      // Optional: adjust on resize
+      window.addEventListener("resize", () => {
+        frame.style.height = window.innerHeight - frame.getBoundingClientRect().top + "px";
       });
-  }
-</script>
-
+    }
+  </script>
 </body>
 </html>
