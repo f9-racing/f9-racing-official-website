@@ -1,133 +1,87 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Article</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Article</title>
 
-<!-- Favicon you want -->
-<link rel="icon" href="https://lh3.googleusercontent.com/d/1GFKnYSgrZVqhVp8ZMqyG5II0nLk_HIPM" type="image/png">
+  <!-- Favicon -->
+  <link rel="icon" href="https://lh3.googleusercontent.com/d/1GFKnYSgrZVqhVp8ZMqyG5II0nLk_HIPM" type="image/png">
 
-<!-- Google Fonts -->
-<link href="https://fonts.googleapis.com/css2?family=Inter&display=swap" rel="stylesheet" />
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      background: #f3f4f6;
+      font-family: Arial, sans-serif;
+    }
 
-<style>
-  body {
-    margin: 0;
-    font-family: 'Inter', sans-serif;
-    background: #f9fafb;
-    color: #222;
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
-  }
+    /* Fullscreen container */
+    #frame {
+      width: 100%;
+      height: 100vh;
+      border: none;
+    }
 
-  main {
-    flex-grow: 1;
-    max-width: 800px;
-    margin: 1rem auto;
-    padding: 0 1rem;
-  }
+    /* Fallback message */
+    #error {
+      display: none;
+      text-align: center;
+      padding: 40px;
+      color: red;
+    }
 
-  #back-to-news {
-    display: block;
-    max-width: 200px;
-    margin: 1.5rem auto;
-    padding: 0.75rem 1.5rem;
-    background-color: #16a085;
-    color: white;
-    text-align: center;
-    font-weight: 600;
-    border-radius: 6px;
-    text-decoration: none;
-    box-shadow: 0 4px 6px rgb(0 0 0 / 0.1);
-    transition: background-color 0.3s ease;
-  }
+    /* News Button */
+    #news-button {
+      display: block;
+      width: 200px;
+      padding: 12px;
+      margin: 20px auto;
+      background-color: #1abc9c; /* Turquoise color */
+      color: white;
+      font-size: 16px;
+      text-align: center;
+      text-decoration: none;
+      border-radius: 5px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
 
-  #back-to-news:hover {
-    background-color: #13876f;
-  }
-
-  #doc-container {
-    background: white;
-    box-shadow: 0 2px 8px rgb(0 0 0 / 0.1);
-    padding: 1.5rem;
-    border-radius: 8px;
-    overflow-x: auto;
-  }
-
-  /* No global hiding of headings! We will remove only from fetched content */
-</style>
+    #news-button:hover {
+      background-color: #16a085; /* Darker turquoise on hover */
+    }
+  </style>
 </head>
+
 <body>
 
-<a id="back-to-news" href="https://sites.google.com/view/f9-racing-official-website/news" rel="noopener noreferrer">Back to News</a>
+  <!-- News Button -->
+  <a id="news-button" href="https://sites.google.com/view/f9-racing-official-website/news" target="_blank">News</a>
 
-<main>
-  <div id="doc-container"></div>
-</main>
+  <iframe id="frame"></iframe>
+  <div id="error">No article found.</div>
 
-<script>
-  const params = new URLSearchParams(window.location.search);
-  const docUrl = params.get("doc");
-  const container = document.getElementById("doc-container");
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const docUrl = params.get("doc");
 
-  if (!docUrl) {
-    container.innerHTML = "<p style='color: red; text-align:center;'>No article found.</p>";
-  } else {
-    fetch(docUrl)
-      .then(response => {
-        if (!response.ok) throw new Error("Failed to load document.");
-        return response.text();
-      })
-      .then(htmlText => {
-        const parser = new DOMParser();
-        const doc = parser.parseFromString(htmlText, "text/html");
+    const frame = document.getElementById("frame");
+    const error = document.getElementById("error");
 
-        // Google Docs published docs wrap content inside div#contents or div#doc-contents or <body>
-        // Find main content container heuristically:
-        let contentContainer = doc.querySelector('#contents') || doc.querySelector('#doc-contents') || doc.body;
+    if (!docUrl) {
+      frame.style.display = "none";
+      error.style.display = "block";
+    } else {
+      // Convert Google Docs link to preview mode
+      let cleanUrl = docUrl
+        .replace("/edit", "/preview")  // Ensure it's in preview mode
+        .replace("/view", "/preview"); // If it's view mode, convert to preview mode
 
-        if (!contentContainer) {
-          throw new Error("Could not find main content in the published document.");
-        }
-
-        // Clone the container to manipulate it without affecting the parsed doc
-        const cleanContent = contentContainer.cloneNode(true);
-
-        // Remove the blue "Published using Google Docs" banner — it usually has role="banner" or class names
-        const banners = cleanContent.querySelectorAll('div[role="banner"], .ndfHFb-c4YZDc-Wrql6b, .kIXpAf');
-        banners.forEach(el => el.remove());
-
-        // Remove unwanted footer texts (including "Updated automatically every 5 minutes")
-        cleanContent.querySelectorAll('p, span, div').forEach(el => {
-          const text = el.textContent?.toLowerCase() || '';
-          if (
-            text.includes('published using google docs') ||
-            text.includes('updated automatically every') ||
-            text.includes('report abuse') ||
-            text.includes('learn more')
-          ) {
-            el.remove();
-          }
-        });
-
-        // Remove headings that are unwanted titles like your S14R10_Report (usually inside h1, h2, etc)
-        cleanContent.querySelectorAll('h1, h2, h3, h4, h5, h6').forEach(el => {
-          // You can customize this to keep some headings if needed
-          el.remove();
-        });
-
-        // Inject the cleaned content into your page container
-        container.innerHTML = "";
-        container.appendChild(cleanContent);
-
-      })
-      .catch(err => {
-        container.innerHTML = `<p style="color: red; text-align:center;">${err.message}</p>`;
-      });
-  }
-</script>
+      frame.src = cleanUrl;
+    }
+  </script>
 
 </body>
 </html>
